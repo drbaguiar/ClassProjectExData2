@@ -1,17 +1,20 @@
-if (!file.exists("C:/Users/bryan_000/Documents/GitHub/Data/summary_data.zip")) {
+##Set working directory to data directory
+setwd('C:/Users/bryan_000/Documents/GitHub/Data/')
+
+if (!file.exists("summary_data.zip")) {
         zip.url <- 'https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip'
-        zip.file <- 'C:/Users/bryan_000/Documents/GitHub/Data/summary_data.zip'
+        zip.file <- 'summary_data.zip'
         download.file(zip.url, destfile = zip.file)
         unzip(zip.file)
 }
 
 if (!exists("NEI")){
         # Read files
-        NEI <- readRDS("C:/Users/bryan_000/Documents/GitHub/Data/summarySCC_PM25.rds")
+        NEI <- readRDS("summarySCC_PM25.rds")
 }
 if (!exists("SCC")){
         # Read files
-        SCC <- readRDS("C:/Users/bryan_000/Documents/GitHub/Data/Source_Classification_Code.rds")
+        SCC <- readRDS("Source_Classification_Code.rds")
 }
 if (!require("plyr")){
       install.packages("plyr")  
@@ -25,7 +28,7 @@ BaltimoreCity <- subset(NEI, fips == "24510")
 typeByYear <- ddply(BaltimoreCity, .(year, type), function(x) sum(x$Emissions))
 colnames(typeByYear)[3] <- "Emissions"
 
-png("C:/Users/bryan_000/Documents/GitHub/Data/plot03.png")
+png("plot03.png")
 qplot(year, Emissions, data=typeByYear, color=type, geom="line") +
         ggtitle(expression("Baltimore City" ~ PM[2.5] ~ "Emissions by Source Type and Year")) +
         xlab("Year") +
