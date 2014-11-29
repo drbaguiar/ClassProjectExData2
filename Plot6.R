@@ -1,27 +1,25 @@
-##Set working directory to data directory
-setwd('C:/Users/bryan_000/Documents/GitHub/Data/')
+source('C:/Users/bryan_000/Documents/GitHub/MyWork/StdOpen.R')
+call("plyr")  
+call("ggplot2")  
 
-if (!file.exists("summary_data.zip")) {
+##Set destination file for download 
+datafile1 <-paste(datadir,"summarySCC_PM25.rds",sep = "")
+datafile2 <-paste(datadir,"Source_Classification_Code.rds",sep = "")
+zip.file <-paste(datadir,"summary_data.zip",sep = "")
+
+if (!file.exists(datafile1)) {
         zip.url <- 'https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip'
-        zip.file <- 'summary_data.zip'
-        download.file(zip.url,zip.file)
+        download.file(zip.url, zip.file)
         unzip(zip.file)
 }
 
 if (!exists("NEI")){
         # Read files
-        NEI <- readRDS("summarySCC_PM25.rds")
+        NEI <- readRDS(datafile1)
 }
 if (!exists("SCC")){
         # Read files
-        SCC <- readRDS("Source_Classification_Code.rds")
-}
-
-if (!require("plyr")){
-        install.packages("plyr")  
-}
-if (!require("ggplot2")){
-        install.packages("ggplot2")  
+        SCC <- readRDS(datafile2)
 }
 
 subsetPM25 <- NEI[NEI$fips == "24510" | NEI$fips == "06037",]
@@ -33,13 +31,9 @@ emissionsByYear <- ddply(motor, c("year", "fips"), summarise, total = sum(Emissi
 
 emissionsByYear$city <- ifelse(emissionsByYear$fips == "24510", "Baltimore", "Los Angeles")
 
-png(filename="Plot06.png")
-qplot(x      = year,
-      xlab   = "Year",
-      y      = total,
-      ylab   = "Total Emissions",
-      data   = emissionsByYear,
-      color  = city,
-      geom   = c("point", "smooth"),
-      method = "loess")
+## write output to .png file
+plot.file <-paste(datadir,"plot06.png",sep = "")
+png(filename = plot.file, width = 480, height = 480, units = "px", pointsize = 12, bg = "white")
+
+qplot(x=year,xlab= "Year",y= total,ylab   = "Total Emissions",data   = emissionsByYear,color  = city,geom   = c("point", "smooth"),method = "loess")
 dev.off()
